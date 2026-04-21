@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: check if the caller is in the given couple
+    function inCouple(coupleId) {
+      return request.auth != null &&
+        (coupleId.matches(request.auth.uid + '_.*') ||
+         coupleId.matches('.*_' + request.auth.uid));
+    }
+
+    // Users: each user can only read/write their own document
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Events: couple members can read; only the owner can write/delete
+    match /events/{eventId} {
+      allow read: if request.auth != null &&
+        inCouple(resource.data.coupleId);
+      allow create: if request.auth != null &&
+        request.resource.data.ownerId == request.auth.uid &&
+        inCouple(request.resource.data.coupleId);
+      allow update, delete: if request.auth != null &&
+        resource.data.ownerId == request.auth.uid;
+    }
+
+    // Canvas: both users in the couple can read and write
+    match /canvas/{coupleId} {
+      allow read, write: if inCouple(coupleId);
+    }
+
+    // Invite codes: any authenticated user can read;
+    // only the creator can write their own code.
+    // Pairing (marking used + setting partnerId/coupleId) is done client-side
+    // in a batch write — the partner uid doc write succeeds because the
+    // partner's doc allows writes by its owner; the invite code update is
+    // allowed below because any auth'd user can mark a code used (the app
+    // validates the code first). For production, move pairing into a Cloud Function.
+    match /inviteCodes/{code} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null &&
+        request.resource.data.createdBy == request.auth.uid;
+      // Allow the recipient to mark the code as used
+      allow update: if request.auth != null;
+    }
+  }
+}
