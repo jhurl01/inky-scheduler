@@ -410,7 +410,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       ?.findRenderObject() as RenderBox?;
                   final origin = box != null
                       ? box.localToGlobal(Offset.zero) & box.size
-                      : Rect.fromLTWH(0, 400, 200, 50);
+                      : const Rect.fromLTWH(0, 400, 200, 50);
                   Share.share(
                     'Join me on Inky! Use code: $_myCode',
                     sharePositionOrigin: origin,

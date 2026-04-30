@@ -33,7 +33,7 @@ ThemeData buildInkyTheme() {
   return ThemeData(
     useMaterial3: true,
     scaffoldBackgroundColor: kBackground,
-    colorScheme: ColorScheme.light(
+    colorScheme: const ColorScheme.light(
       primary: kNearBlack,
       secondary: kNearBlack,
       surface: kBackground,
@@ -61,7 +61,7 @@ ThemeData buildInkyTheme() {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: kBorder),
+        side: const BorderSide(color: kBorder),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(

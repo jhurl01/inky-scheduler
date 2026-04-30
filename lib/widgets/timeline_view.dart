@@ -59,10 +59,10 @@ class _TimelineViewState extends State<TimelineView> {
   @override
   Widget build(BuildContext context) {
     // Total pixel height of the scrollable canvas
-    final totalHeight = kTotalHours * kHourHeight;
+    const totalHeight = kTotalHours * kHourHeight;
 
     return LayoutBuilder(builder: (context, constraints) {
-      final eventsColumnLeft = kLabelColumnWidth;
+      const eventsColumnLeft = kLabelColumnWidth;
       final eventsColumnWidth = constraints.maxWidth - kLabelColumnWidth;
 
       return SingleChildScrollView(

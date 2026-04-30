@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../providers/auth_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../theme.dart';
 
@@ -449,7 +448,7 @@ class _YouScreenState extends ConsumerState<YouScreen> {
             ],
 
             // ── Account actions ───────────────────────────────────────
-            _SectionLabel('account'),
+            const _SectionLabel('account'),
             _SettingsCard(
               child: Column(
                 children: [

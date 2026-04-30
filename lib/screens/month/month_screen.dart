@@ -104,16 +104,16 @@ class _MonthScreenState extends ConsumerState<MonthScreen> {
                     color: kMutedGray,
                     fontWeight: FontWeight.w500),
               ),
-              calendarStyle: CalendarStyle(
+              calendarStyle: const CalendarStyle(
                 outsideDaysVisible: false,
                 defaultTextStyle:
-                    const TextStyle(fontSize: 14, color: kNearBlack),
+                    TextStyle(fontSize: 14, color: kNearBlack),
                 weekendTextStyle:
-                    const TextStyle(fontSize: 14, color: kNearBlack),
+                    TextStyle(fontSize: 14, color: kNearBlack),
                 // todayDecoration and selectedDecoration overridden above via builders
-                todayDecoration: const BoxDecoration(),
-                selectedDecoration: const BoxDecoration(),
-                markerDecoration: const BoxDecoration(), // handled by builder
+                todayDecoration: BoxDecoration(),
+                selectedDecoration: BoxDecoration(),
+                markerDecoration: BoxDecoration(), // handled by builder
                 markersMaxCount: 0, // prevent default markers
               ),
             ),
@@ -228,17 +228,17 @@ class _CanvasPreview extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'canvas',
                   style: TextStyle(
                       fontSize: 12,
                       color: kMutedGray,
                       fontWeight: FontWeight.w500),
                 ),
-                const Text(
+                Text(
                   'open canvas →',
                   style: TextStyle(fontSize: 12, color: kMutedGray),
                 ),
