@@ -32,7 +32,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
   bool _loading = false;
   String? _error;
-  bool _paired = false; // true after account creation — show pairing UI
+  bool _isSignIn = false;    // toggle between sign-up and sign-in
+  bool _paired = false;      // true after account creation — show pairing UI
   String? _myCode;
 
   @override
@@ -99,6 +100,34 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         _myCode = code;
         _loading = false;
       });
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        _error = e.message;
+        _loading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> _signIn() async {
+    final email = _emailCtrl.text.trim();
+    final pass = _passCtrl.text;
+    if (email.isEmpty || pass.isEmpty) {
+      setState(() => _error = 'Please enter your email and password.');
+      return;
+    }
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: email, password: pass);
+      // Router redirect handles navigation once auth state updates
     } on FirebaseAuthException catch (e) {
       setState(() {
         _error = e.message;
@@ -185,7 +214,11 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-          child: _paired ? _buildPairingView() : _buildSignUpView(),
+          child: _paired
+              ? _buildPairingView()
+              : _isSignIn
+                  ? _buildSignInView()
+                  : _buildSignUpView(),
         ),
       ),
     );
@@ -244,6 +277,79 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           label: 'Create Account',
           loading: _loading,
           onTap: _createAccount,
+        ),
+        const SizedBox(height: 16),
+        Center(
+          child: TextButton(
+            onPressed: () => setState(() {
+              _isSignIn = true;
+              _error = null;
+            }),
+            child: const Text(
+              'Already have an account? Sign in →',
+              style: TextStyle(color: kMutedGray, fontSize: 14),
+            ),
+          ),
+        ),
+        const SizedBox(height: 32),
+      ],
+    );
+  }
+
+  Widget _buildSignInView() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 52),
+        const Text(
+          'inky',
+          style: TextStyle(
+            fontSize: 44,
+            fontWeight: FontWeight.w300,
+            letterSpacing: 5,
+            color: kNearBlack,
+          ),
+        ),
+        const SizedBox(height: 6),
+        const Text(
+          'welcome back',
+          style: TextStyle(color: kMutedGray, fontSize: 15),
+        ),
+        const SizedBox(height: 48),
+        TextField(
+          controller: _emailCtrl,
+          keyboardType: TextInputType.emailAddress,
+          decoration: const InputDecoration(hintText: 'email'),
+        ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _passCtrl,
+          obscureText: true,
+          decoration: const InputDecoration(hintText: 'password'),
+        ),
+        if (_error != null) ...[
+          const SizedBox(height: 12),
+          Text(_error!,
+              style: const TextStyle(color: Colors.redAccent, fontSize: 13)),
+        ],
+        const SizedBox(height: 28),
+        _PrimaryButton(
+          label: 'Sign In',
+          loading: _loading,
+          onTap: _signIn,
+        ),
+        const SizedBox(height: 16),
+        Center(
+          child: TextButton(
+            onPressed: () => setState(() {
+              _isSignIn = false;
+              _error = null;
+            }),
+            child: const Text(
+              'New here? Create an account →',
+              style: TextStyle(color: kMutedGray, fontSize: 14),
+            ),
+          ),
         ),
         const SizedBox(height: 32),
       ],
