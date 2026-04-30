@@ -145,7 +145,7 @@ class _YouScreenState extends ConsumerState<YouScreen> {
         backgroundColor: kCardSurface,
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('unpair?',
+        title: const Text('Unpair?',
             style: TextStyle(fontSize: 17, color: kNearBlack)),
         content: const Text(
           'This will disconnect you from your partner. You can re-pair later with a new code.',
@@ -159,7 +159,7 @@ class _YouScreenState extends ConsumerState<YouScreen> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('unpair',
+            child: const Text('Unpair',
                 style: TextStyle(color: Colors.redAccent)),
           ),
         ],
@@ -216,7 +216,7 @@ class _YouScreenState extends ConsumerState<YouScreen> {
           children: [
             const SizedBox(height: 8),
             const Text(
-              'you',
+              'Profile',
               style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.w300,
@@ -454,14 +454,14 @@ class _YouScreenState extends ConsumerState<YouScreen> {
                 children: [
                   if (me.coupleId != null) ...[
                     _ActionRow(
-                      label: 'unpair',
+                      label: 'Unpair',
                       color: Colors.redAccent.shade100,
                       onTap: _unpair,
                     ),
                     const Divider(height: 1),
                   ],
                   _ActionRow(
-                    label: 'sign out',
+                    label: 'Sign Out',
                     color: kMutedGray,
                     onTap: _signOut,
                   ),

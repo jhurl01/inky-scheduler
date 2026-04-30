@@ -68,6 +68,7 @@ class _MonthScreenState extends ConsumerState<MonthScreen> {
               calendarBuilders: CalendarBuilders(
                 // Custom dot markers below each day number
                 markerBuilder: (ctx, day, dayEvents) {
+                  if (dayEvents.isEmpty) return null;
                   final typed = dayEvents.cast<EventModel>();
                   return _DayMarkers(
                     events: typed,
@@ -149,20 +150,17 @@ class _DayMarkers extends StatelessWidget {
     final hasPartnerOnly = partner != null &&
         events.any((e) => !e.isPaired && e.ownerId == partner!.uid);
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 2),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (hasPaired)
-            InkDot(
-              color: hexToColor(me?.color ?? '#B8A9D9'),
-              color2: hexToColor(partner?.color ?? '#A9C9D9'),
-            ),
-          if (hasOwnOnly) InkDot(color: hexToColor(me?.color ?? '#B8A9D9')),
-          if (hasPartnerOnly) InkDot(color: hexToColor(partner!.color)),
-        ],
-      ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        if (hasPaired)
+          InkDot(
+            color: hexToColor(me?.color ?? '#B8A9D9'),
+            color2: hexToColor(partner?.color ?? '#A9C9D9'),
+          ),
+        if (hasOwnOnly) InkDot(color: hexToColor(me?.color ?? '#B8A9D9')),
+        if (hasPartnerOnly) InkDot(color: hexToColor(partner!.color)),
+      ],
     );
   }
 }

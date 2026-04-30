@@ -6,12 +6,14 @@ import 'user_provider.dart';
 /// All events for the couple — real-time stream.
 final eventsStreamProvider = StreamProvider<List<EventModel>>((ref) {
   final me = ref.watch(currentUserProvider).valueOrNull;
-  if (me?.coupleId == null) return Stream.value([]);
+  if (me == null) return Stream.value([]);
 
+  // Use same coupleId fallback as add_event_sheet (solo users store uid as coupleId)
+  final coupleId = me.coupleId ?? me.uid;
   return ref
       .watch(firestoreProvider)
       .collection('events')
-      .where('coupleId', isEqualTo: me!.coupleId)
+      .where('coupleId', isEqualTo: coupleId)
       .snapshots()
       .map((snap) => snap.docs.map((d) => EventModel.fromDoc(d)).toList());
 });
