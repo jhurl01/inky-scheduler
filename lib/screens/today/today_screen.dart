@@ -6,6 +6,7 @@ import '../../providers/events_provider.dart';
 import '../../providers/ui_state_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../theme.dart';
+import '../../widgets/event_block.dart';
 import '../../widgets/timeline_view.dart';
 
 class TodayScreen extends ConsumerStatefulWidget {
@@ -48,7 +49,7 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
     final targetHour =
         isToday && now.hour >= kTimelineStartHour ? now.hour : 8;
     final offset =
-        ((targetHour - kTimelineStartHour) * kHourHeight).clamp(0.0, double.infinity);
+        ((targetHour - kTimelineStartHour) * kHourHeight).clamp(0.0, double.infinity).toDouble();
     if (_scrollCtrl.hasClients) {
       _scrollCtrl.animateTo(
         offset,

@@ -51,7 +51,7 @@ ThemeData buildInkyTheme() {
         fontWeight: FontWeight.w500,
       ),
     ),
-    bottomAppBarTheme: const BottomAppBarTheme(
+    bottomAppBarTheme: const BottomAppBarThemeData(
       color: kBackground,
       elevation: 0,
       surfaceTintColor: Colors.transparent,
