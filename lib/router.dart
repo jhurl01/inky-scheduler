@@ -3,17 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'providers/auth_provider.dart';
-import 'providers/ui_state_provider.dart';
 import 'providers/user_provider.dart';
 import 'screens/canvas/canvas_screen.dart';
 import 'screens/month/month_screen.dart';
 import 'screens/onboarding/onboarding_screen.dart';
-import 'screens/today/add_event_sheet.dart';
 import 'screens/today/event_detail_screen.dart';
 import 'screens/today/today_screen.dart';
 import 'screens/you/you_screen.dart';
 import 'widgets/bottom_nav.dart';
-import 'widgets/ink_fab.dart';
 
 // ── Router provider ────────────────────────────────────────────────────────────
 
@@ -95,32 +92,15 @@ final routerProvider = Provider<GoRouter>((ref) {
 
 // ── Shell widget ───────────────────────────────────────────────────────────────
 
-class _MainShell extends ConsumerWidget {
+class _MainShell extends StatelessWidget {
   final String location;
   final Widget child;
   const _MainShell({required this.location, required this.child});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final viewedDate = ref.watch(viewedDateProvider);
-
+  Widget build(BuildContext context) {
     return Scaffold(
       body: child,
-      floatingActionButton: InkFab(
-        onTap: () => showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (_) => Padding(
-            // Respect keyboard insets so the sheet slides above the keyboard
-            padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom),
-            child: AddEventSheet(initialDate: viewedDate),
-          ),
-        ),
-      ),
-      floatingActionButtonLocation:
-          FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomNavBar(currentLocation: location),
     );
   }

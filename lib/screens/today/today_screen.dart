@@ -95,10 +95,20 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
     final me = ref.watch(currentUserProvider).valueOrNull;
     final events = ref.watch(eventsForDateProvider(_displayDate));
 
+    final now = DateTime.now();
+    final isToday = _displayDate.year == now.year &&
+        _displayDate.month == now.month &&
+        _displayDate.day == now.day;
+
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
+            _ScreenHeader(
+              isToday
+                  ? 'Today'
+                  : DateFormat('EEEE').format(_displayDate),
+            ),
             _DateHeader(
               date: _displayDate,
               onPrev: () => _stepDay(-1),
@@ -115,6 +125,32 @@ class _TodayScreenState extends ConsumerState<TodayScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── Screen title ─────────────────────────────────────────────────────────────
+
+class _ScreenHeader extends StatelessWidget {
+  final String title;
+  const _ScreenHeader(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.w300,
+            color: kNearBlack,
+            letterSpacing: 0.2,
+          ),
         ),
       ),
     );

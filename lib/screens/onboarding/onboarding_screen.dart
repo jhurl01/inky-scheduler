@@ -22,6 +22,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
+  final _confirmPassCtrl = TextEditingController();
 
   // Pairing
   final _codeCtrl = TextEditingController();
@@ -39,6 +40,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     _nameCtrl.dispose();
     _emailCtrl.dispose();
     _passCtrl.dispose();
+    _confirmPassCtrl.dispose();
     _codeCtrl.dispose();
     super.dispose();
   }
@@ -59,8 +61,13 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     final name = _nameCtrl.text.trim();
     final email = _emailCtrl.text.trim();
     final pass = _passCtrl.text;
-    if (name.isEmpty || email.isEmpty || pass.isEmpty) {
+    final confirmPass = _confirmPassCtrl.text;
+    if (name.isEmpty || email.isEmpty || pass.isEmpty || confirmPass.isEmpty) {
       setState(() => _error = 'Please fill in all fields.');
+      return;
+    }
+    if (pass != confirmPass) {
+      setState(() => _error = 'Passwords do not match.');
       return;
     }
     setState(() {
@@ -221,6 +228,12 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           obscureText: true,
           decoration: const InputDecoration(hintText: 'password'),
         ),
+        const SizedBox(height: 12),
+        TextField(
+          controller: _confirmPassCtrl,
+          obscureText: true,
+          decoration: const InputDecoration(hintText: 'confirm password'),
+        ),
         if (_error != null) ...[
           const SizedBox(height: 12),
           Text(_error!,
@@ -228,7 +241,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         ],
         const SizedBox(height: 28),
         _PrimaryButton(
-          label: 'create account',
+          label: 'Create Account',
           loading: _loading,
           onTap: _createAccount,
         ),
@@ -298,7 +311,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   );
                 },
                 icon: const Icon(Icons.ios_share, size: 16),
-                label: const Text('share my code'),
+                label: const Text('Share My Code'),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: kNearBlack,
                   side: const BorderSide(color: kBorder),
@@ -335,7 +348,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         ],
         const SizedBox(height: 16),
         _PrimaryButton(
-          label: 'connect',
+          label: 'Connect',
           loading: _loading,
           onTap: _enterPartnerCode,
         ),

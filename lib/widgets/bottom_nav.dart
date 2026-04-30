@@ -1,27 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../providers/ui_state_provider.dart';
+import '../screens/today/add_event_sheet.dart';
 import '../theme.dart';
 
-/// Bottom app bar with four navigation destinations arranged around the
-/// center FAB notch: [Today] [Month]  ●FAB●  [Canvas] [You].
-/// The spec names the four items as Today, Month, Add (center), You; Canvas
-/// is included here because it has its own dedicated screen.
-class BottomNavBar extends StatelessWidget {
+/// Flat five-slot bottom nav bar:
+/// [Today] [Month] [  +  ] [Canvas] [Profile]
+/// The center Add button opens the AddEvent sheet directly — no FAB notch.
+class BottomNavBar extends ConsumerWidget {
   final String currentLocation;
 
   const BottomNavBar({super.key, required this.currentLocation});
 
+  void _showAddEvent(BuildContext context, DateTime date) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Padding(
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: AddEventSheet(initialDate: date),
+      ),
+    );
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final idx = _indexFrom(currentLocation);
-    return BottomAppBar(
+    final viewedDate = ref.watch(viewedDateProvider);
+    final bottomPad = MediaQuery.of(context).padding.bottom;
+
+    return Container(
       color: kBackground,
-      elevation: 0,
-      height: 62,
-      notchMargin: 6,
-      shape: const CircularNotchedRectangle(),
-      padding: EdgeInsets.zero,
+      padding: EdgeInsets.only(bottom: bottomPad),
       child: Row(
         children: [
           _NavItem(
@@ -38,8 +52,34 @@ class BottomNavBar extends StatelessWidget {
             active: idx == 1,
             onTap: () => context.go('/month'),
           ),
-          // Spacer creates the notch gap for the FAB
-          const Expanded(child: SizedBox()),
+          // ── Center add button ──────────────────────────────────────
+          Expanded(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => _showAddEvent(context, viewedDate),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 46,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        color: kNearBlack,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Icon(Icons.add,
+                          color: kBackground, size: 22),
+                    ),
+                    const SizedBox(height: 2),
+                    // Empty label keeps vertical alignment with other items
+                    const Text('', style: TextStyle(fontSize: 10)),
+                  ],
+                ),
+              ),
+            ),
+          ),
           _NavItem(
             icon: Icons.chat_bubble_outline,
             activeIcon: Icons.chat_bubble,
@@ -50,7 +90,7 @@ class BottomNavBar extends StatelessWidget {
           _NavItem(
             icon: Icons.person_outline,
             activeIcon: Icons.person,
-            label: 'You',
+            label: 'Profile',
             active: idx == 3,
             onTap: () => context.go('/you'),
           ),
@@ -63,7 +103,7 @@ class BottomNavBar extends StatelessWidget {
     if (loc.startsWith('/month')) return 1;
     if (loc.startsWith('/canvas')) return 2;
     if (loc.startsWith('/you')) return 3;
-    return 0; // /today, /day/:date, /event/:id
+    return 0;
   }
 }
 

@@ -33,6 +33,23 @@ class _MonthScreenState extends ConsumerState<MonthScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // ── Screen title ──────────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  DateFormat('MMMM').format(_focusedDay),
+                  style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w300,
+                    color: kNearBlack,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ),
+            ),
+
             // ── Calendar ──────────────────────────────────────────────────
             TableCalendar(
               firstDay: DateTime(2020),
@@ -125,17 +142,24 @@ class _DayMarkers extends StatelessWidget {
   Widget build(BuildContext context) {
     if (events.isEmpty) return const SizedBox.shrink();
 
-    final hasOwn = events.any((e) => e.ownerId == me?.uid);
-    final hasPartner =
-        partner != null && events.any((e) => e.ownerId == partner!.uid);
+    final hasPaired = events.any((e) => e.isPaired);
+    final hasOwnOnly =
+        events.any((e) => !e.isPaired && e.ownerId == me?.uid);
+    final hasPartnerOnly = partner != null &&
+        events.any((e) => !e.isPaired && e.ownerId == partner!.uid);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 2),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          if (hasOwn) InkDot(color: hexToColor(me?.color ?? '#B8A9D9')),
-          if (hasPartner) InkDot(color: hexToColor(partner!.color)),
+          if (hasPaired)
+            InkDot(
+              color: hexToColor(me?.color ?? '#B8A9D9'),
+              color2: hexToColor(partner?.color ?? '#A9C9D9'),
+            ),
+          if (hasOwnOnly) InkDot(color: hexToColor(me?.color ?? '#B8A9D9')),
+          if (hasPartnerOnly) InkDot(color: hexToColor(partner!.color)),
         ],
       ),
     );

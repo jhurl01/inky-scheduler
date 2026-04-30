@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../models/event_model.dart';
@@ -18,7 +19,7 @@ double durationToHeight(Duration d) => (d.inMinutes / 60) * kHourHeight;
 class EventBlock extends StatelessWidget {
   final EventModel event;
   final bool isOwn;
-  final double columnLeft; // left offset of the events column (label width)
+  final double columnLeft;
   final double columnWidth;
   final VoidCallback onTap;
 
@@ -37,6 +38,9 @@ class EventBlock extends StatelessWidget {
     final height =
         durationToHeight(event.duration).clamp(20.0, double.infinity);
     final accent = hexToColor(event.color);
+    final accent2 = event.isPaired && event.partnerColor != null
+        ? hexToColor(event.partnerColor!)
+        : null;
 
     return Positioned(
       top: top,
@@ -46,26 +50,38 @@ class EventBlock extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Opacity(
-          // Partner events appear more translucent
           opacity: isOwn ? 1.0 : 0.6,
           child: Container(
             decoration: BoxDecoration(
-              color: accent.withOpacity(0.15),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: accent.withOpacity(0.3), width: 0.5),
+              gradient: accent2 != null
+                  ? LinearGradient(
+                      colors: [
+                        accent.withOpacity(0.18),
+                        accent2.withOpacity(0.18),
+                      ],
+                    )
+                  : null,
+              color: accent2 == null ? accent.withOpacity(0.15) : null,
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // 3dp left accent bar
-                Container(
-                  width: 3,
-                  decoration: BoxDecoration(
-                    color: accent,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      bottomLeft: Radius.circular(16),
-                    ),
+                // Left accent bar — split vertically for paired events
+                ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    bottomLeft: Radius.circular(16),
+                  ),
+                  child: SizedBox(
+                    width: 3,
+                    child: accent2 != null
+                        ? Column(children: [
+                            Expanded(child: ColoredBox(color: accent)),
+                            Expanded(child: ColoredBox(color: accent2)),
+                          ])
+                        : ColoredBox(color: accent),
                   ),
                 ),
                 Expanded(

@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../models/event_model.dart';
 import '../../providers/user_provider.dart';
 import '../../theme.dart';
+import '../../widgets/ink_dot.dart';
 
 class AddEventSheet extends ConsumerStatefulWidget {
   final DateTime initialDate;
@@ -29,6 +30,7 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
   late DateTime _date;
   late TimeOfDay _startTime;
   late TimeOfDay _endTime;
+  bool _isPaired = false;
   bool _saving = false;
   String? _error;
 
@@ -130,20 +132,26 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
 
     try {
       final me = ref.read(currentUserProvider).valueOrNull;
-      if (me == null || me.coupleId == null) throw Exception('Not paired.');
+      if (me == null) throw Exception('Not signed in.');
+      final partner = ref.read(partnerProvider).valueOrNull;
+
+      // Fall back to solo coupleId (own uid) when not yet paired
+      final coupleId = me.coupleId ?? me.uid;
 
       final db = ref.read(firestoreProvider);
       final data = EventModel(
         id: widget.editingEvent?.id ?? '',
         ownerId: me.uid,
-        coupleId: me.coupleId!,
+        coupleId: coupleId,
         title: title,
         startTime: start,
         endTime: end,
         location:
             _locationCtrl.text.trim().isEmpty ? null : _locationCtrl.text.trim(),
         note: _noteCtrl.text.trim().isEmpty ? null : _noteCtrl.text.trim(),
-        color: me.color, // always the owner's current color
+        color: me.color,
+        isPaired: _isPaired && partner != null,
+        partnerColor: (_isPaired && partner != null) ? partner.color : null,
       ).toMap();
 
       if (widget.editingEvent != null) {
@@ -164,6 +172,8 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final partner = ref.watch(partnerProvider).valueOrNull;
+    final me = ref.watch(currentUserProvider).valueOrNull;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     return Container(
       padding: EdgeInsets.fromLTRB(24, 20, 24, 24 + bottomInset),
@@ -250,6 +260,52 @@ class _AddEventSheetState extends ConsumerState<AddEventSheet> {
             maxLines: 2,
             decoration: const InputDecoration(hintText: 'note (optional)'),
           ),
+          const SizedBox(height: 12),
+
+          // Paired event toggle (only shown when partner exists)
+          if (partner != null) ...[
+            GestureDetector(
+              onTap: () => setState(() => _isPaired = !_isPaired),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: _isPaired ? kNearBlack.withOpacity(0.05) : kCardSurface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: _isPaired ? kNearBlack.withOpacity(0.2) : kBorder,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Row(
+                      children: [
+                        InkDot(color: hexToColor(me?.color ?? '#B8A9D9')),
+                        const SizedBox(width: 4),
+                        InkDot(color: hexToColor(partner.color)),
+                      ],
+                    ),
+                    const SizedBox(width: 10),
+                    const Expanded(
+                      child: Text(
+                        'paired event',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: kNearBlack,
+                        ),
+                      ),
+                    ),
+                    Switch(
+                      value: _isPaired,
+                      onChanged: (v) => setState(() => _isPaired = v),
+                      activeColor: kNearBlack,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
 
           if (_error != null) ...[
             const SizedBox(height: 10),
