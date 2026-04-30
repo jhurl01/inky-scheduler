@@ -26,6 +26,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   // Pairing
   final _codeCtrl = TextEditingController();
 
+  // Used to anchor the iOS share sheet to the share button
+  final _shareButtonKey = GlobalKey();
+
   bool _loading = false;
   String? _error;
   bool _paired = false; // true after account creation — show pairing UI
@@ -281,8 +284,19 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
               const SizedBox(height: 18),
               OutlinedButton.icon(
-                onPressed: () =>
-                    Share.share('Join me on Inky! Use code: $_myCode'),
+                key: _shareButtonKey,
+                onPressed: () {
+                  // iOS requires sharePositionOrigin to anchor the share sheet
+                  final box = _shareButtonKey.currentContext
+                      ?.findRenderObject() as RenderBox?;
+                  final origin = box != null
+                      ? box.localToGlobal(Offset.zero) & box.size
+                      : Rect.fromLTWH(0, 400, 200, 50);
+                  Share.share(
+                    'Join me on Inky! Use code: $_myCode',
+                    sharePositionOrigin: origin,
+                  );
+                },
                 icon: const Icon(Icons.ios_share, size: 16),
                 label: const Text('share my code'),
                 style: OutlinedButton.styleFrom(
@@ -324,6 +338,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
           label: 'connect',
           loading: _loading,
           onTap: _enterPartnerCode,
+        ),
+        const SizedBox(height: 16),
+        Center(
+          child: TextButton(
+            onPressed: () => context.go('/today'),
+            child: const Text(
+              'skip for now →',
+              style: TextStyle(color: kMutedGray, fontSize: 14),
+            ),
+          ),
         ),
         const SizedBox(height: 32),
       ],

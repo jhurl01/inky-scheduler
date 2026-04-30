@@ -42,12 +42,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       // Signed in but Firestore doc still loading
       if (userModel == null) return null;
 
-      // Signed in but not paired → onboarding (pairing step)
-      if (userModel.coupleId == null) {
-        return onOnboarding ? null : '/onboarding';
-      }
-
-      // Paired and somehow on onboarding → main app
+      // Signed in (paired or solo) — leave onboarding and go to main app
       if (onOnboarding) return '/today';
 
       return null; // no redirect
