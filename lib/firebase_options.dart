@@ -47,12 +47,12 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'REPLACE_WITH_IOS_API_KEY',
-    appId: 'REPLACE_WITH_IOS_APP_ID',
-    messagingSenderId: 'REPLACE_WITH_SENDER_ID',
-    projectId: 'REPLACE_WITH_PROJECT_ID',
-    storageBucket: 'REPLACE_WITH_PROJECT_ID.appspot.com',
-    iosBundleId: 'com.example.inky',
+    apiKey: 'AIzaSyBOD5aFPZmkB2kOfebgjXzACEAjzsyvh9c',
+    appId: '1:175342956313:ios:8066aa635d878b4b389f88',
+    messagingSenderId: '175342956313',
+    projectId: 'inky-schedule',
+    storageBucket: 'inky-schedule.firebasestorage.app',
+    iosBundleId: 'com.hurleyhouse.inky',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
